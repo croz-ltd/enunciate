@@ -560,6 +560,8 @@ public class Enunciate implements Runnable {
         }
       }
 
+      filterScanPath(scanpath);
+
       Reflections reflections = loadApiReflections(scanpath);
       Set<String> scannedEntries = reflections.getStore().get(EnunciateReflectionsScanner.class.getSimpleName()).keySet();
       Set<String> includedTypes = new HashSet<String>();
@@ -752,6 +754,15 @@ public class Enunciate implements Runnable {
     } else {
       this.logger.warn("No Enunciate modules have been loaded. No work was done.");
     }
+  }
+
+  private void filterScanPath(List<URL> scanpath) {
+    scanpath.removeIf(url -> {
+      String urlString = url.toString();
+      boolean notJar = !urlString.endsWith(".jar");
+      boolean notDir = !urlString.endsWith("/");
+      return notJar && notDir;
+    });
   }
 
   private String findEncoding(List<String> compilerArgs) {
